@@ -1,3 +1,5 @@
+select version();
+
 DROP TABLE if exists transactions cascade;
 DROP TABLE if exists cards cascade;
 DROP TABLE if exists accounts cascade;
@@ -16,8 +18,7 @@ create table clients (
 
     CONSTRAINT pk_clients
         PRIMARY key (client_id)
-	distributed by randomly
-    );
+    )distributed by (client_id);
     
     
 create table accounts (
@@ -30,8 +31,7 @@ create table accounts (
     CONSTRAINT fk_accounts
         FOREIGN KEY (client)
         REFERENCES clients(client_id)
-	distributed by randomly
-    );
+    )distributed by (account_num);
     
 create table cards (
     card_num varchar(100),
@@ -42,8 +42,7 @@ create table cards (
     CONSTRAINT fk_cards
         FOREIGN KEY (account_num)
         REFERENCES accounts(account_num)
-	distributed by randomly
-    );
+    )distributed by (card_num);
     
 create table terminals (
     terminal_id varchar(100),
@@ -53,9 +52,7 @@ create table terminals (
 
     CONSTRAINT pk_terminals
         unique (terminal_id)
-	distributed by randomly
-    );
-    
+    )distributed by (terminal_id);
 
 CREATE TABLE transactions (
     trans_id varchar(100),
@@ -71,9 +68,9 @@ CREATE TABLE transactions (
     CONSTRAINT terminal_fk 
         FOREIGN KEY (terminal)
         REFERENCES terminals(terminal_id)
-	distributed by (terminal)
-    );
-
+    )distributed by (terminal);
+   
+   
 drop table if exists dim_clients_hist;
 drop table if exists dim_accounts_hist;
 drop table if exists dim_cards_hist;
@@ -91,8 +88,7 @@ create table dim_clients_hist (
     phone varchar(100),
     start_dt date,
     end_dt date
-	distributed by randomly
-    );
+    )distributed randomly;
    
 create table dim_accounts_hist  (
     account_num varchar(100),
@@ -100,16 +96,14 @@ create table dim_accounts_hist  (
     client varchar(100),
 	start_dt date,
     end_dt date
-	distributed by randomly
-    );
+    )distributed randomly;
    
 create table dim_cards_hist (
     card_num varchar(100),
     account_num varchar(100),
 	start_dt date,
     end_dt date
-	distributed by randomly
-    );
+    )distributed randomly;
    
 create table dim_terminals_hist (
     terminal_id varchar(100),
@@ -118,8 +112,7 @@ create table dim_terminals_hist (
     terminal_address varchar(100),
 	start_dt date,
     end_dt date
-	distributed by randomly
-    );
+    )distributed randomly;
    
 CREATE TABLE dim_transactions_hist (
     trans_id varchar(100),
@@ -131,8 +124,7 @@ CREATE TABLE dim_transactions_hist (
     terminal varchar(100),
     start_dt date,
     end_dt date
-	distributed by randomly
-    );
+    )distributed randomly;
     
    
 drop table if exists report;
@@ -143,11 +135,10 @@ create table report (
 	phone varchar(100),
 	fraud_type varchar(200),
 	report_dt timestamp
-	distributed by randomly
-	);
-	
+	)distributed randomly;
 
-drop table fact_transactions;
+
+drop table if exists fact_transactions;
 commit;
 create table fact_transactions (
     trans_id varchar(100),
@@ -170,6 +161,5 @@ create table fact_transactions (
     terminal_type varchar(100),
     city varchar(100),
     address varchar(100)
-	distributed by randomly
-);
+)distributed randomly;
 commit;
